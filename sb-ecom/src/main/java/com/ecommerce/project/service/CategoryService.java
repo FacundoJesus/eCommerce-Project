@@ -25,7 +25,6 @@ public class CategoryService implements iCategoryService {
         category.setCategoryId(nextId++);
         categories.add(category);
 
-
     }
 
     public String deleteCategory(Long categoryId) {
