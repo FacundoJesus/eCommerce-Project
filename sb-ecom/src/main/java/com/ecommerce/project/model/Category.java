@@ -1,9 +1,15 @@
 package com.ecommerce.project.model;
 
-public class Category {
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
+@Entity(name="Categories")
+public class Category {
+    @Id
     private Long categoryId;
     private String categoryName;
+
 
     public Long getCategoryId() {
         return categoryId;
@@ -19,6 +25,7 @@ public class Category {
         this.categoryName = categoryName;
     }
 
+    public Category() {}
     public Category(Long categoryId, String categoryName) {
         this.categoryId = categoryId;
         this.categoryName = categoryName;
