@@ -32,7 +32,7 @@ public class CategoryService implements iCategoryService {
         Optional<Category> savedCategoryOptional = categoryRepository.findById(categoryId);
 
         if (savedCategoryOptional.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Resource not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Category not found");
         }
         categoryRepository.deleteById(categoryId);
         return "Category with categoryId: " + categoryId + " deleted succesfully!";
