@@ -7,7 +7,7 @@ import com.ecommerce.project.payload.CategoryResponse;
 
 public interface iCategoryService {
 
-    CategoryResponse getAllCategories();
+    CategoryResponse getAllCategories(Integer pageNumber, Integer pageSize);
 
     CategoryDTO createCategory(CategoryDTO categoryDTO);
 
