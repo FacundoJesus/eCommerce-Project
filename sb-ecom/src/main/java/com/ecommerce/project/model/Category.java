@@ -7,8 +7,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
 
-@Entity(name="Categories")
+
+@Entity(name="categories")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,4 +24,7 @@ public class Category {
     @Size (min = 5, message = "Category name must contain atleast 5 characters")
     private String categoryName;
 
+
+    @OneToMany
+    List<Product> products = new ArrayList<>();
 }
