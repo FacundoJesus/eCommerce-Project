@@ -1,18 +1,17 @@
 package com.ecommerce.project.payload;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+public class ProductResponse {
 
-//Solicitud de categoría
-public class CategoryDTO {
-
-    private Long categoryId;
-    private String categoryName;
-
+    private List<ProductDTO> content;
 
 }
