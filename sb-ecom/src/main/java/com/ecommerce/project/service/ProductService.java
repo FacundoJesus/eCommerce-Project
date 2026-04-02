@@ -50,7 +50,7 @@ public class ProductService implements iProductService{
         List<Product> products = productRepository.findAll();
 
         List<ProductDTO> productDTOS = products.stream()
-                .map(product -> modelMapper.map(products,ProductDTO.class))
+                .map(product -> modelMapper.map(product,ProductDTO.class))
                         .toList();
 
         ProductResponse productResponse = new ProductResponse();
