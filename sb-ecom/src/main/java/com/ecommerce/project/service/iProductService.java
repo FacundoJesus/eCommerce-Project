@@ -12,4 +12,8 @@ public interface iProductService {
     ProductResponse getProductsByCategory(Long categoryId);
 
     ProductResponse searchProductByKeyword(String keyword);
+
+    ProductDTO updateProduct(Long productId, Product product);
+
+    ProductDTO deleteProduct(Long productId);
 }
