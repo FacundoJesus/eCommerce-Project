@@ -8,4 +8,8 @@ public interface iProductService {
     ProductDTO addProduct(Long categoryId, Product product);
 
     ProductResponse getAllProducts();
+
+    ProductResponse getProductsByCategory(Long categoryId);
+
+    ProductResponse searchProductByKeyword(String keyword);
 }
