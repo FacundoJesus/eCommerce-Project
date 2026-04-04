@@ -11,9 +11,15 @@ import com.ecommerce.project.repositories.iProductRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -129,6 +135,50 @@ public class ProductService implements iProductService{
         productRepository.delete(productFromDb);
 
         return modelMapper.map(productFromDb,ProductDTO.class);
+
+    }
+
+
+    @Override
+    public ProductDTO updateProductImage(Long productId, MultipartFile image) throws IOException {
+
+        //Obtener el producto de la base de datos
+        Product productFromDb = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product","productId",productId));
+
+        //Subir la imagen al servidor y obtener el nombre de la imagen actualizada
+        String path = "images/";
+        String fileName = uploadImage(path, image);
+
+        //Actualizar el nombre del nuevo archivo al producto obtenido de la base de datos
+        productFromDb.setImage(fileName);
+
+        //Guardar el producto actualizado
+        Product updatedProduct = productRepository.save(productFromDb);
+        //Mappear el producto a DTO y retornarlo
+        return modelMapper.map(updatedProduct,ProductDTO.class);
+    }
+
+    private String uploadImage(String path, MultipartFile file) throws IOException {
+        //Obtener nombre del archivo original
+        String originalFileName = file.getOriginalFilename();
+
+        //nombrar el archivo de forma unica para evitar conflictos de nombres. (Generar un nombre unico)
+        String randomId = UUID.randomUUID().toString();
+        //mat.jpg --> 1234 --> 1234.jpg
+        String fileName = randomId.concat(originalFileName.substring(originalFileName.lastIndexOf('.')));
+        String filePath = path + File.separator + fileName;
+
+        //Comprobar si la rutha existe y crearla
+        File folder = new File(path);
+        if(!folder.exists())
+            folder.mkdir();
+
+        //proceso de carga al servidor
+        Files.copy(file.getInputStream(), Paths.get(filePath));
+
+        //Retornar el nombre del archivo
+        return fileName;
 
     }
 
