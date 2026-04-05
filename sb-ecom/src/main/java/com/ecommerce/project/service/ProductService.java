@@ -1,6 +1,7 @@
 package com.ecommerce.project.service;
 
 
+import com.ecommerce.project.exceptions.APIException;
 import com.ecommerce.project.exceptions.ResourceNotFoundException;
 import com.ecommerce.project.model.Category;
 import com.ecommerce.project.model.Product;
@@ -10,17 +11,13 @@ import com.ecommerce.project.repositories.iCategoryRepository;
 import com.ecommerce.project.repositories.iProductRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
+
 
 @Service
 public class ProductService implements iProductService{
@@ -33,6 +30,12 @@ public class ProductService implements iProductService{
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private FileService fileService;
+
+    @Value("${project.image}")
+    private String path;
+
 
     @Override
     public ProductDTO addProduct(Long categoryId, ProductDTO productDTO) {
@@ -40,25 +43,41 @@ public class ProductService implements iProductService{
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Category","categoryId",categoryId));
 
-        Product product = modelMapper.map(productDTO, Product.class);
+        //Chequear si el producto esta presente o no con el nombre.
+        boolean isProductNotPresent = true;
+        List<Product> products = category.getProducts();
+        for(int i = 0; i<products.size(); i++) {
+            if(products.get(i).getProductName().equals(productDTO.getProductName())) {
+                isProductNotPresent = false;
+                break;
+            }
+        }
+        if(isProductNotPresent) {
+            Product product = modelMapper.map(productDTO, Product.class);
 
-        product.setImage("image.jpg");
-        product.setCategory(category);
+            product.setImage("image.jpg");
+            product.setCategory(category);
 
-        double specialPrice = product.getPrice() * (1 - product.getDiscount() / 100.0);
+            double specialPrice = product.getPrice() * (1 - product.getDiscount() / 100.0);
 
-        product.setSpecialPrice(specialPrice);
+            product.setSpecialPrice(specialPrice);
 
-        Product savedProduct =  productRepository.save(product);
+            Product savedProduct =  productRepository.save(product);
 
-        return modelMapper.map(savedProduct, ProductDTO.class);
-
+            return modelMapper.map(savedProduct, ProductDTO.class);
+        }
+        else {
+            throw new APIException("Product already exist!");
+        }
     }
+
 
     @Override
     public ProductResponse getAllProducts() {
 
         List<Product> products = productRepository.findAll();
+        if(products.isEmpty())
+            throw new APIException("No products Exist!");
 
         List<ProductDTO> productDTOS = products.stream()
                 .map(product -> modelMapper.map(product,ProductDTO.class))
@@ -80,6 +99,9 @@ public class ProductService implements iProductService{
         //Importante. obtenemos todos los productos de esa categoría en específico.
         List<Product> products = productRepository.findByCategoryOrderByPriceAsc(category);
 
+        if(products.isEmpty())
+            throw new APIException("No products created till now.");
+
         List<ProductDTO> productDTOS = products.stream()
                 .map(product -> modelMapper.map(product,ProductDTO.class))
                 .toList();
@@ -95,6 +117,8 @@ public class ProductService implements iProductService{
 
         List<Product> products = productRepository.findByProductNameLikeIgnoreCase('%' + keyword + '%');
 
+        if(products.isEmpty())
+            throw new APIException("No products created till now.");
 
         List<ProductDTO> productDTOS = products.stream()
                 .map(product -> modelMapper.map(product,ProductDTO.class))
@@ -147,8 +171,7 @@ public class ProductService implements iProductService{
                 .orElseThrow(() -> new ResourceNotFoundException("Product","productId",productId));
 
         //Subir la imagen al servidor y obtener el nombre de la imagen actualizada
-        String path = "images/";
-        String fileName = uploadImage(path, image);
+        String fileName = fileService.uploadImage(path, image);
 
         //Actualizar el nombre del nuevo archivo al producto obtenido de la base de datos
         productFromDb.setImage(fileName);
@@ -157,29 +180,6 @@ public class ProductService implements iProductService{
         Product updatedProduct = productRepository.save(productFromDb);
         //Mappear el producto a DTO y retornarlo
         return modelMapper.map(updatedProduct,ProductDTO.class);
-    }
-
-    private String uploadImage(String path, MultipartFile file) throws IOException {
-        //Obtener nombre del archivo original
-        String originalFileName = file.getOriginalFilename();
-
-        //nombrar el archivo de forma unica para evitar conflictos de nombres. (Generar un nombre unico)
-        String randomId = UUID.randomUUID().toString();
-        //mat.jpg --> 1234 --> 1234.jpg
-        String fileName = randomId.concat(originalFileName.substring(originalFileName.lastIndexOf('.')));
-        String filePath = path + File.separator + fileName;
-
-        //Comprobar si la rutha existe y crearla
-        File folder = new File(path);
-        if(!folder.exists())
-            folder.mkdir();
-
-        //proceso de carga al servidor
-        Files.copy(file.getInputStream(), Paths.get(filePath));
-
-        //Retornar el nombre del archivo
-        return fileName;
-
     }
 
 }
