@@ -52,11 +52,13 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
+
     //RELACION CON PRODUCTOS, SI EL USUARIO ES VENDEDOR
     @ToString.Exclude
     @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE},
                 orphanRemoval = true)
     private Set<Product> products;
+
 
     //RELACION CON DIRECCIONES
     @Getter
@@ -66,6 +68,7 @@ public class User {
                 joinColumns = @JoinColumn(name="user_id"),
                 inverseJoinColumns = @JoinColumn(name="address_id"))
     private List<Address> adresses = new ArrayList<>();
+
 
 
     public User(String userName, String email, String password) {
