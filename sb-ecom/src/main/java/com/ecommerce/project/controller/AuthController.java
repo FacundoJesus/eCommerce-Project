@@ -51,9 +51,11 @@ public class AuthController {
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
 
-        Authentication authentication;
+        Authentication authentication; //Va a contener el usuario autenticado
 
         try {
+            //Autenticación !!
+            //Internamente llama a UserDetailsServiceImpl.loadUserByUsername()
             authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             loginRequest.getUsername(),
@@ -68,16 +70,19 @@ public class AuthController {
             map.put("status", false);
             return new ResponseEntity<Object>(map, HttpStatus.UNAUTHORIZED);
         }
-
+        //Guardar autenticación
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
+        //Obtener usuario autenticado
+        // tiene el id, username y roles.
         UserDetailsImpl userDetails = (UserDetailsImpl)authentication.getPrincipal();
+        //Generar cookie con JWT
         ResponseCookie jwtCokie = jwtUtils.generateJwtCookie(userDetails);
-
+        //Obtener roles
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(item -> item.getAuthority())
                 .collect(Collectors.toList());
 
+        //Crear respuesta - DTO al Front
         UserInfoResponse response = new UserInfoResponse(userDetails.getId(),
                                         userDetails.getUsername(),roles);
 
@@ -103,8 +108,8 @@ public class AuthController {
                             passwordEncoder.encode(signupRequest.getPassword()));
 
         Set<String> strRoles = signupRequest.getRole();
-        Set<Role> roles = new HashSet<>();
 
+        Set<Role> roles = new HashSet<>();
         if(strRoles == null) {
             Role userRole = roleRepository.findByRoleName(AppRole.ROLE_USER)
                     .orElseThrow (() -> new RuntimeException("Error: Role is not found"));
@@ -150,10 +155,11 @@ public class AuthController {
     @GetMapping("/user")
     public ResponseEntity<?> getUserDetails(Authentication authentication) {
 
+        //Recupero el usuario autenticado
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
         List<String> roles = userDetails.getAuthorities().stream()
-                .map(item -> item.getAuthority())
+                .map(rol -> rol.getAuthority())
                 .collect(Collectors.toList());
 
         UserInfoResponse response = new UserInfoResponse(userDetails.getId(),
