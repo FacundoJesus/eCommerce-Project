@@ -11,6 +11,10 @@ import org.springframework.stereotype.Service;
 
 
 @Service
+/**
+ * Clase que funciona como servicio que usa Spring Security para buscar usuarios en la base de datos.
+ * Cada vez que alguien se autentica (login o JWT), Spring llama a: loadUserByUsername(...)
+ */
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired

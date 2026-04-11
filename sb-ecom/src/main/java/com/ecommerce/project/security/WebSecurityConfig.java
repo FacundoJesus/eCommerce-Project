@@ -27,49 +27,59 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import java.util.Set;
 
-@Configuration
-@EnableWebSecurity
+@Configuration //Clase de Configuracion
+@EnableWebSecurity //Activa Spring Security
 //@EnableMethodSecurity
 public class WebSecurityConfig {
 
     @Autowired
-    UserDetailsServiceImpl userDetailsService;
+    private UserDetailsServiceImpl userDetailsService;
 
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
 
     @Bean
+    /**Registrás tu filtro personalizado
+     lee cookie
+     valida JWT
+     autentica usuario
+     */
     public AuthTokenFilter authenticationJwtTokenFilter() {
         return new AuthTokenFilter();
     }
 
     @Bean
+    //Usa mi BD para autenticar usuarios
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider(userDetailsService);
-        //authenticationProvider.setUserDetailsService(userDetailsService);
         authenticationProvider.setPasswordEncoder(passwordEncoder());
         return authenticationProvider;
     }
 
     @Bean
+    //Maneja el login, se usa en el controller
     public AuthenticationManager authenticationManager(AuthenticationConfiguration  authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
     }
 
+
     @Bean
+    //Encripta passwords
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
+    //LO MAS IMPORTANTE
+    //Configuracion de todo el comportamiento.
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http.csrf(csrf -> csrf.disable())
-                .exceptionHandling(exception ->
+                .exceptionHandling(exception -> //Manejo de excepciones
                         exception.authenticationEntryPoint(unauthorizedHandler))
-                .sessionManagement( session ->
+                .sessionManagement( session -> //No usa sesiones, todo se basa en JWT
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth ->
+                .authorizeHttpRequests(auth -> //Autorizaciones de ruta
                         auth.requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()
                                 .requestMatchers("/h2-console/**").permitAll()
@@ -79,10 +89,14 @@ public class WebSecurityConfig {
                                 .requestMatchers("/api/test/**").permitAll()
                                 .requestMatchers("/images/**").permitAll()
 
-                        .anyRequest().authenticated());
+                        .anyRequest().authenticated()); //El resto requiere Loggin
 
+        //Conectar provider
         http.authenticationProvider(authenticationProvider());
+        //Agregar filtro JWT antes del login de Spring
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+
+        //Permite usar H2 console
         http.headers(headers->
                 headers.frameOptions(frameOptionsConfig -> frameOptionsConfig.sameOrigin()));
 
@@ -91,6 +105,7 @@ public class WebSecurityConfig {
 
 
     @Bean
+    //Ignora seguridad en rutas
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web -> web.ignoring()
                 .requestMatchers("/v2/api-docs",
@@ -103,11 +118,12 @@ public class WebSecurityConfig {
 
 
 
-    //Metodo para inicializar la base de datos.
+    //Metodo para inicializar la base de datos. - Se ejecuta al iniciar la app
     @Bean
     public CommandLineRunner initData(iRoleRepository roleRepository, iUserRepository userRepository, PasswordEncoder passwordEncoder) {
         return args -> {
-            // Retrieve or create roles
+
+            // Crear Roles
             Role userRole = roleRepository.findByRoleName(AppRole.ROLE_USER)
                     .orElseGet(() -> {
                         Role newUserRole = new Role(AppRole.ROLE_USER);
@@ -131,7 +147,7 @@ public class WebSecurityConfig {
             Set<Role> adminRoles = Set.of(userRole, sellerRole, adminRole);
 
 
-            // Create users if not already present
+            // Crear usuarios si no existen
             if (!userRepository.existsByUserName("user1")) {
                 User user1 = new User("user1", "user1@example.com", passwordEncoder.encode("password1"));
                 userRepository.save(user1);
@@ -147,7 +163,7 @@ public class WebSecurityConfig {
                 userRepository.save(admin);
             }
 
-            // Update roles for existing users
+            // Asignar roles
             userRepository.findByUserName("user1").ifPresent(user -> {
                 user.setRoles(userRoles);
                 userRepository.save(user);

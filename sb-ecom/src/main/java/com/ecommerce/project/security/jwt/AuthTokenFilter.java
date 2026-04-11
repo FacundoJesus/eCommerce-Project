@@ -18,7 +18,17 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 @Component
-//CLASE EN LA QUE PERSONALIZO MI PROPIO FILTRO DE SEGURIDAD con la ayuda de JwUtils
+/**CLASE EN LA QUE PERSONALIZO MI PROPIO FILTRO DE SEGURIDAD con el uso de la clase JwUtils
+ * 📩 Llega request (/api/...)
+ * 🔍 Filtro se ejecuta
+ * 🍪 Lee cookie (JWT)
+ * ✅ Valida token
+ * 👤 Extrae username
+ * 📦 Carga usuario desde BD
+ * 🔐 Crea autenticación
+ * 🧠 La guarda en SecurityContext
+ * 🚀 Continúa request
+**/
 public class AuthTokenFilter extends OncePerRequestFilter {
 
     @Autowired
@@ -40,16 +50,20 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         try {
 
             String jwt = parseJwt(request);
+
             if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
 
                 String userName = jwtUtils.getUserNameFromJWTToken(jwt);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
-                //Creo objeto de autenticación.
+                //Crear autenticación
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         userDetails,null,userDetails.getAuthorities()
                 );
+                //Agregar detalles de la request
                 authentication.setDetails((new WebAuthenticationDetailsSource().buildDetails(request)));
+                //Setear usuario autenticado
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+
                 logger.debug("Roles from JWT: {}",userDetails.getAuthorities());
 
             }
@@ -57,10 +71,11 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             logger.error("Cannot set user authentication: {}", ex.getMessage());
         }
 
+        //Continuar la cadena de filtros
         filterChain.doFilter(request, response);
     }
 
-    //Obtengo la cabecera de la solicitud
+    //Obtiene el JWT desde la cookie
     private String parseJwt(HttpServletRequest request) {
         String jwt = jwtUtils.getJwtFromCookies(request);
         logger.debug("AuthoTokenFilter.java: {}", jwt);

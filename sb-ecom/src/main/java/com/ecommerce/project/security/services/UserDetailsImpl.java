@@ -39,41 +39,47 @@ public class UserDetailsImpl implements UserDetails {
         this.authorities = authorities;
     }
 
+    //METODO IMPORTANTE: Convierte la entidad User → UserDetailsImpl para que spring security pueda trabajar con ella
     public static UserDetailsImpl build(User user) {
 
+        //Toma los roles del usuario
         List<GrantedAuthority> authorities = user.getRoles().stream()
+        //Convierte cada rol en un formato que entiende Spring
                 .map(role -> new SimpleGrantedAuthority(role.getRoleName().name()))
+                //Los guarda en una lista
                         .collect(Collectors.toList());
 
+        //Retorna el objeto ya listo para usar en Spring Security
         return new UserDetailsImpl(user.getUserId(),user.getUserName(),user.getEmail(),
                 user.getPassword(),authorities);
     }
 
+    //Devuelve los roles
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.authorities;
     }
-
+    //Devuelve el password
     @Override
     public @Nullable String getPassword() {
         return this.password;
     }
-
+    //Devuelve el username
     @Override
     public String getUsername() {
         return this.username;
     }
-
+    //Cuenta activa:true
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
-
+    //Cuenta no bloqueada:true
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
-
+    //Cuenta no expirada:true
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
@@ -85,6 +91,7 @@ public class UserDetailsImpl implements UserDetails {
     }
 
     @Override
+    //No permite duplicados por Id de Usuario
     public boolean equals(Object o) {
         if(this == o)
             return true;
@@ -95,6 +102,5 @@ public class UserDetailsImpl implements UserDetails {
 
         return Objects.equals(id, user.id);
     }
-
 
 }
