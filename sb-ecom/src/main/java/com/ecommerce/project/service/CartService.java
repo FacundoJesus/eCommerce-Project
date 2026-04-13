@@ -95,19 +95,41 @@ public class CartService implements iCartService{
 
         List<Cart> carts = cartRepository.findAll();
 
-        if(carts.size() == 0)
+        if(carts.isEmpty())
             throw new APIException("No cart exists.");
 
         List<CartDTO> cartDTOs = carts.stream()
                 .map(cart -> {CartDTO cartDTO = modelMapper.map(cart,CartDTO.class);
-                List<ProductDTO> products = cart.getCartItems().stream()
+                    List<ProductDTO> products = cart.getCartItems().stream()
                             .map(p -> modelMapper.map(p.getProduct(),ProductDTO.class))
                             .collect(Collectors.toList());
+
                 cartDTO.setProducts(products);
                 return cartDTO;
                 }).collect(Collectors.toList());
 
         return cartDTOs;
+    }
+
+    @Override
+    public CartDTO getCart(String emailId, Long cartId) {
+
+        Cart cart = cartRepository.findCartByEmailAndCartId(emailId,cartId);
+
+        if(cart == null)
+            throw new ResourceNotFoundException("Cart", "cartId", cartId);
+
+        CartDTO cartDTO = modelMapper.map(cart,CartDTO.class);
+
+        cart.getCartItems().forEach(c->c.getProduct().setQuantity(c.getQuantity()));
+
+        List<ProductDTO> productsDTO = cart.getCartItems().stream()
+                .map(p -> modelMapper.map(p.getProduct(), ProductDTO.class))
+                .collect(Collectors.toList());
+
+        cartDTO.setProducts(productsDTO);
+
+        return cartDTO;
     }
 
     //Crear carro
