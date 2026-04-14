@@ -155,19 +155,31 @@ public class CartService implements iCartService{
                     "less than or equal to the quantity " + product.getQuantity() + ".");
 
         CartItem cartItem = cartItemRepository.findCartItemByProductIdAndCartId(cartId,productId);
+
         if(cartItem == null) {
             throw new APIException("Product " + product.getProductName() + " Not available in the Cart.");
         }
 
-        cartItem.setProductPrice(product.getSpecialPrice());
-        cartItem.setQuantity(cartItem.getQuantity() + quantity);
-        cartItem.setDiscount(product.getDiscount());
+        //Calcular nueva cantidad
+        int newQuantity = cartItem.getQuantity() + quantity;
+        //Validar cantidad negativa
+        if (newQuantity < 0)
+            throw new APIException("The resulting quantity cannot be negative.");
 
-        cart.setTotalPrice(cart.getTotalPrice() + (cartItem.getProductPrice() * quantity));
+        if(newQuantity == 0)
 
-        cartRepository.save(cart);
+            deleteProductFromCart(cartId, productId);
+        else {
+            cartItem.setProductPrice(product.getSpecialPrice());
+            cartItem.setQuantity(cartItem.getQuantity() + quantity);
+            cartItem.setDiscount(product.getDiscount());
+
+            cart.setTotalPrice(cart.getTotalPrice() + (cartItem.getProductPrice() * quantity));
+
+            cartRepository.save(cart);
+        }
+
         CartItem updatedItem = cartItemRepository.save(cartItem);
-
         if(updatedItem.getQuantity() == 0) {
             cartItemRepository.deleteById(updatedItem.getCartItemId());
         }
@@ -177,7 +189,7 @@ public class CartService implements iCartService{
 
         Stream<ProductDTO> productDTOStream = cartItems.stream().map( item -> {
             ProductDTO productDto = modelMapper.map(item.getProduct(), ProductDTO.class);
-            product.setQuantity(item.getQuantity());
+            productDto.setQuantity(item.getQuantity());
             return productDto;
         });
 
@@ -186,6 +198,7 @@ public class CartService implements iCartService{
         return cartDTO;
     }
 
+    @Transactional
     @Override
     public String deleteProductFromCart(Long cartId, Long productId) {
 
@@ -206,6 +219,7 @@ public class CartService implements iCartService{
         return "Product " + cartItem.getProduct().getProductName() + " removed from the cart.";
 
     }
+
 
     //Crear carro
     private Cart createCart() {
