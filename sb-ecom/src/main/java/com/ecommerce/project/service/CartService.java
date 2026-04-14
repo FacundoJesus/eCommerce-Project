@@ -207,7 +207,6 @@ public class CartService implements iCartService{
 
 
         CartItem cartItem = cartItemRepository.findCartItemByProductIdAndCartId(cartId,productId);
-
         if(cartItem == null) {
             throw new ResourceNotFoundException("Product","productId",productId);
         }
@@ -218,6 +217,33 @@ public class CartService implements iCartService{
 
         return "Product " + cartItem.getProduct().getProductName() + " removed from the cart.";
 
+    }
+
+    @Override
+    public void updateProductInCarts(Long cartId, Long productId) {
+
+        //Validaciones
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new ResourceNotFoundException("Cart","cartId",cartId));
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product","productId",productId));
+
+        CartItem cartItem = cartItemRepository.findCartItemByProductIdAndCartId(cartId,productId);
+        if(cartItem == null) {
+            throw new APIException("Product " + product.getProductName() + " not available in the cart.");
+        }
+
+        //1000 - 100*2 = 800
+        double cartPrice = cart.getTotalPrice() - (cartItem.getProductPrice() * cartItem.getQuantity());
+
+        //200
+        cartItem.setProductPrice(product.getSpecialPrice());
+
+        //800 + (200*2) = 1200
+        cart.setTotalPrice(cartPrice +
+                (cartItem.getProductPrice() * cartItem.getQuantity()));
+
+        cartItemRepository.save(cartItem);
     }
 
 
