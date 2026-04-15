@@ -55,6 +55,7 @@ public class CategoryService implements iCategoryService {
         categoryResponse.setTotalElements(categoryPage.getTotalElements());
         categoryResponse.setTotalPages(categoryPage.getTotalPages());
         categoryResponse.setLastPage(categoryPage.isLast());
+
         return categoryResponse;
     }
 
@@ -104,8 +105,5 @@ public class CategoryService implements iCategoryService {
         CategoryDTO deletedCategoryDTO = modelMapper.map(savedCategoryOptional,CategoryDTO.class);
         return deletedCategoryDTO;
     }
-
-
-
 
 }

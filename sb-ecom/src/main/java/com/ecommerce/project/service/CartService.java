@@ -49,10 +49,7 @@ public class CartService implements iCartService{
         Product product = productRepository.findById(productId)
                 .orElseThrow(()-> new ResourceNotFoundException("Product","productId", productId));
 
-        CartItem cartItem = cartItemRepository.findCartItemByProductIdAndCartId(
-                cart.getCartId(),
-                productId
-        );
+        CartItem cartItem = cartItemRepository.findCartItemByProductIdAndCartId( cart.getCartId(), productId);
 
         if(cartItem != null)
             throw new APIException("Product " + product.getProductName() + " already exists in the cart.");
@@ -101,6 +98,7 @@ public class CartService implements iCartService{
 
         List<CartDTO> cartDTOs = carts.stream()
                 .map(cart -> {CartDTO cartDTO = modelMapper.map(cart,CartDTO.class);
+
                     List<ProductDTO> products = cart.getCartItems().stream()
                             .map(p -> modelMapper.map(p.getProduct(),ProductDTO.class))
                             .collect(Collectors.toList());
