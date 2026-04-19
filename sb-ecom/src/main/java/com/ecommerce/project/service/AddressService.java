@@ -110,7 +110,6 @@ public class AddressService implements iAddressService{
         userRepository.save(user);
 
         AddressDTO updatedAddressDTO = modelMapper.map(updatedAddress,AddressDTO.class);
-
         return updatedAddressDTO;
     }
 
