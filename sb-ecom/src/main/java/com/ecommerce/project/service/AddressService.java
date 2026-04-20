@@ -44,7 +44,6 @@ public class AddressService implements iAddressService{
         AddressDTO savedAdressDTO = modelMapper.map(savedAddress, AddressDTO.class);
 
         return savedAdressDTO;
-
     }
 
     @Override
@@ -127,6 +126,5 @@ public class AddressService implements iAddressService{
         addressRepository.delete(addressFromDb);
         return "Address deleted succesfully with addressId: " + addressId;
     }
-
 
 }
