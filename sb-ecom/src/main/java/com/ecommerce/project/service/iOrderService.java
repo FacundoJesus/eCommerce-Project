@@ -1,7 +1,10 @@
 package com.ecommerce.project.service;
 
 import com.ecommerce.project.payload.OrderDTO;
+import jakarta.transaction.Transactional;
 
 public interface iOrderService {
-    OrderDTO placeOrder(String emailId, Long addressId, String paymentMethod, String pgName, String paymentMethod1, String pgStatus, String pgResponseMessage);
+
+    @Transactional
+    OrderDTO placeOrder(String emailId, Long addressId, String pgPaymentId, String pgName, String paymentMethod, String pgStatus, String pgResponseMessage);
 }

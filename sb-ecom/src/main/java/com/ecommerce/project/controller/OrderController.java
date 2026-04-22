@@ -29,7 +29,7 @@ public class OrderController {
                 orderRequestDTO.getAddressId(),
                 paymentMethod,
                 orderRequestDTO.getPgName(),
-                orderRequestDTO.getPaymentMethod(),
+                orderRequestDTO.getPgPaymentId(),
                 orderRequestDTO.getPgStatus(),
                 orderRequestDTO.getPgResponseMessage()
         );
