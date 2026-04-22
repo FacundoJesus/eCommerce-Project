@@ -4,15 +4,18 @@ import com.ecommerce.project.exceptions.APIException;
 import com.ecommerce.project.exceptions.ResourceNotFoundException;
 import com.ecommerce.project.model.*;
 import com.ecommerce.project.payload.OrderDTO;
+import com.ecommerce.project.payload.OrderItemDTO;
 import com.ecommerce.project.repositories.*;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class OrderService implements iOrderService {
 
     @Autowired
@@ -29,6 +32,12 @@ public class OrderService implements iOrderService {
 
     @Autowired
     private iOrderItemRepository orderItemsRepository;
+
+    @Autowired
+    private iProductRepository productRepository;
+
+    @Autowired
+    private iCartService cartService;
 
 
     @Autowired
@@ -61,11 +70,12 @@ public class OrderService implements iOrderService {
         Payment payment = new Payment(paymentMethod, pgPaymentId, pgStatus, pgResponseMessage,pgName);
         payment.setOrder(order);
         payment = paymentRepository.save(payment);
+
         order.setPayment(payment);
 
         Order savedOrder = orderRepository.save(order);
 
-        //Obtener los items del carrito en los elementos de la orden
+        //Transformar los artículos del carrito en artículos del pedido.
         List<CartItem> cartItems = cart.getCartItems();
         if(cartItems.isEmpty())
             throw new APIException("The Cart is empty");
@@ -85,12 +95,25 @@ public class OrderService implements iOrderService {
 
         //--------POST ORDEN---------
         //Actualizar el Stock de Productos
-        
+        cart.getCartItems().forEach( item -> {
+            int quantity = item.getQuantity();
+            Product product = item.getProduct();
+            product.setQuantity(product.getQuantity() - quantity);
+            productRepository.save(product);
 
-        //Limpiar el Carrito
+            //Limpiar el Carrito
+            cartService.deleteProductFromCart(cart.getCartId(),item.getProduct().getProductId());
+        });
 
         //Guardar la orden summary
+        OrderDTO orderDTO = modelMapper.map(savedOrder, OrderDTO.class);
 
-        return null;
+        orderItems.forEach(item ->
+                orderDTO.getOrderItems().add(
+                        modelMapper.map(item, OrderItemDTO.class)));
+
+        orderDTO.setAddressId(addressId);
+
+        return orderDTO;
     }
 }
