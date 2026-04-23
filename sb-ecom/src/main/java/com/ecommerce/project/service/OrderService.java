@@ -50,7 +50,7 @@ public class OrderService implements iOrderService {
                                String pgName, String pgPaymentId, String pgStatus,
                                String pgResponseMessage) {
 
-        //Obtener el carrito del usuario
+        // Obtener el carrito del usuario
         Cart cart = cartRepository.findCartByEmail(emailId);
         if(cart == null)
             throw new ResourceNotFoundException("Cart","emailId",emailId);
@@ -59,7 +59,7 @@ public class OrderService implements iOrderService {
                 .orElseThrow(() -> new ResourceNotFoundException("Adress","addressId",addressId));
 
 
-        //Crear una nueva orden con la informacion del pago
+        // Crear una nueva orden con la informacion del pago
         Order order = new Order();
         order.setEmail(emailId);
         order.setOrderDate((LocalDate.now()));
@@ -75,7 +75,7 @@ public class OrderService implements iOrderService {
 
         Order savedOrder = orderRepository.save(order);
 
-        //Transformar los artículos del carrito en artículos del pedido.
+        // Transformar los artículos del carrito en artículos del pedido.
         List<CartItem> cartItems = cart.getCartItems();
         if(cartItems.isEmpty())
             throw new APIException("The Cart is empty");
@@ -88,6 +88,7 @@ public class OrderService implements iOrderService {
             orderItem.setDiscount(item.getDiscount());
             orderItem.setOrderedProductPrice(item.getProductPrice());
             orderItem.setOrder(savedOrder);
+
             orderItems.add(orderItem);
         }
 

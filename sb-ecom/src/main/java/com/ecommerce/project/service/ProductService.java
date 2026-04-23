@@ -56,7 +56,7 @@ public class ProductService implements iProductService{
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Category","categoryId",categoryId));
 
-        //Chequear si el producto esta presente o no con el nombre.
+        // Chequear si el producto esta presente o no con el nombre.
         boolean isProductNotPresent = true;
         List<Product> products = category.getProducts();
         for(int i = 0; i<products.size(); i++) {
@@ -89,11 +89,11 @@ public class ProductService implements iProductService{
     @Override
     public ProductResponse getAllProducts(Integer pageNumber, Integer pageSize,String sortBy,String sortOrder) {
 
-        //Ordenamiento
+        // Ordenamiento
         Sort sortByAndOrder = sortOrder.equalsIgnoreCase("asc")
                 ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
-        //Paginación
+        // Paginación
         Pageable pageDetails = PageRequest.of(pageNumber,pageSize, sortByAndOrder);
         Page<Product> pageProducts = productRepository.findAll(pageDetails);
         List<Product> products = pageProducts.getContent();
@@ -202,12 +202,11 @@ public class ProductService implements iProductService{
 
         Product updatedProduct = productRepository.save(productFromDb);
 
-        //Actualizar el precio en los carritos del producto actualizado.
-        //Buscar todos los carritos por id del producto.
+        // Actualizar el precio en los carritos del producto actualizado.
+        // Buscar todos los carritos por id del producto.
         List<Cart> carts = cartRepository.findCartsByProductId(productId);
 
         List<CartDTO> cartDTOs = carts.stream().map(cart -> {
-
             CartDTO cartDTO = modelMapper.map(cart,CartDTO.class);
 
             List<ProductDTO> productsDTO = cart.getCartItems().stream()
@@ -218,7 +217,7 @@ public class ProductService implements iProductService{
 
             return cartDTO;
 
-        }).collect(Collectors.toList());
+        }).toList();
 
         cartDTOs.forEach(cart -> cartService.updateProductInCarts(cart.getCartId(), productId));
 
