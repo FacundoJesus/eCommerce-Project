@@ -4,6 +4,7 @@ import com.ecommerce.project.payload.OrderDTO;
 import com.ecommerce.project.payload.OrderRequestDTO;
 import com.ecommerce.project.service.OrderService;
 import com.ecommerce.project.util.AuthUtil;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ public class OrderController {
     @Autowired
     private AuthUtil authUtil;
 
+    @Operation(summary = "Place a new order", description = "API place a new order")
     @PostMapping("/order/users/payments/{paymentMethod}")
     public ResponseEntity<OrderDTO> orderProducts(@Valid @PathVariable String paymentMethod,
                                                    @RequestBody OrderRequestDTO orderRequestDTO) {

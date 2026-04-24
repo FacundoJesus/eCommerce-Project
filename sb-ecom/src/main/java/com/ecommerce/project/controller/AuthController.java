@@ -11,6 +11,7 @@ import com.ecommerce.project.security.request.SignupRequest;
 import com.ecommerce.project.security.response.MessageResponse;
 import com.ecommerce.project.security.response.UserInfoResponse;
 import com.ecommerce.project.security.services.UserDetailsImpl;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,7 @@ public class AuthController {
     @Autowired
     private iRoleRepository roleRepository;
 
+    @Operation(summary = "Authenticate user", description = "API to Authenticate user")
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
 
@@ -93,7 +95,7 @@ public class AuthController {
                         .body(response);
     }
 
-
+    @Operation(summary = "Register user", description = "API to Register user")
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signupRequest) {
 
@@ -146,6 +148,7 @@ public class AuthController {
 
     }
 
+    @Operation(summary = "Get username of the authenticated user", description = "API to Get username of the authenticated user")
     @GetMapping("/username")
     public String currentUserName(Authentication authentication) {
         if(authentication != null) {
@@ -154,6 +157,7 @@ public class AuthController {
         return null;
     }
 
+    @Operation(summary = "Get details of the authenticated user", description = "API to Get details of the authenticated user")
     @GetMapping("/user")
     public ResponseEntity<?> getUserDetails(Authentication authentication) {
 
@@ -171,6 +175,7 @@ public class AuthController {
 
     }
 
+    @Operation(summary = "Sign Out", description = "API to Sign Out")
     @PostMapping("/signout")
     public ResponseEntity<?> signOutUser() {
 
