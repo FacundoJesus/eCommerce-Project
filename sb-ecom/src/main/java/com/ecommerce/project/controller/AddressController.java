@@ -63,7 +63,7 @@ public class AddressController {
         AddressDTO updatedAddressDTO = addressService.updateAddressById(addressId,addressDTO);
         return new ResponseEntity<>(updatedAddressDTO,HttpStatus.OK);
     }
-    
+
     @Operation(summary = "Delete address by Id", description = "API to Delete address by Id")
     @DeleteMapping("/addresses/{addressId}")
     public ResponseEntity<String> deleteAddressById (@PathVariable Long addressId) {

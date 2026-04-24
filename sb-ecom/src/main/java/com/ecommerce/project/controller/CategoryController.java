@@ -58,10 +58,8 @@ public class CategoryController {
 
     @Operation(summary = "Update category", description = "API to update the existing category")
     @PutMapping("/public/categories/{categoryId}")
-    public ResponseEntity<CategoryDTO> updateCategory(@Parameter(description = "ID of the Category that you wish to update")
-                                                          @Valid @RequestBody CategoryDTO categoryDTO,
+    public ResponseEntity<CategoryDTO> updateCategory(@Valid @RequestBody CategoryDTO categoryDTO,
                                                       @PathVariable Long categoryId) {
-
         CategoryDTO updatedCategoryDTO = categoryService.updateCategory(categoryDTO,categoryId);
         return new ResponseEntity<>(updatedCategoryDTO, HttpStatus.OK);
     }
