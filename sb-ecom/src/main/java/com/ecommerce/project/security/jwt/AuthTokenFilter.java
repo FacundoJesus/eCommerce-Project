@@ -40,7 +40,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthTokenFilter.class);
 
-    //Metodo en el que creo mi propio filtro personalizado.
+    // Metodo en el que creo mi propio filtro personalizado.
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
@@ -75,11 +75,27 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    //Obtiene el JWT desde la cookie
+    // Obtiene el JWT desde la cookie
+    /*
     private String parseJwt(HttpServletRequest request) {
         String jwt = jwtUtils.getJwtFromCookies(request);
         logger.debug("AuthoTokenFilter.java: {}", jwt);
         return jwt;
     }
+    */
+    private String parseJwt(HttpServletRequest request) {
+
+        String jwtFromCookie = jwtUtils.getJwtFromCookies(request);
+        if(jwtFromCookie != null)
+            return jwtFromCookie;
+
+        String jwtFromHeader = jwtUtils.getJwtFromHeader(request);
+        if(jwtFromHeader != null)
+            return jwtFromHeader;
+
+        return null;
+    }
+
+
 
 }

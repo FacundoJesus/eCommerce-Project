@@ -46,12 +46,22 @@ public class JwtUtils {
     private String jwtCookie;
 
 
-    //Obtener el JWT desde la cookie
+    // Obtener el JWT desde la cookie
     public String getJwtFromCookies(HttpServletRequest request) {
         Cookie cookie = WebUtils.getCookie(request, jwtCookie);
         if(cookie != null) {
             return cookie.getValue();
         }
+        return null;
+    }
+
+    // Obtener el token de la cabezera (Para swagger)
+    public String getJwtFromHeader(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+
+        if(bearerToken != null && bearerToken.startsWith("Bearer "))
+            return bearerToken.substring(7);
+
         return null;
     }
 
