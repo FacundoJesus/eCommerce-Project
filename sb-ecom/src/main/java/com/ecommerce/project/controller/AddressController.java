@@ -5,6 +5,7 @@ import com.ecommerce.project.model.User;
 import com.ecommerce.project.payload.AddressDTO;
 import com.ecommerce.project.service.AddressService;
 import com.ecommerce.project.util.AuthUtil;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "Adresses APIs", description = "APIs for managing addreses") //Swagger: Agrupar metodos
 @RestController
 @RequestMapping("/api")
 public class AddressController {

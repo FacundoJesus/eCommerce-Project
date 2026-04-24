@@ -83,11 +83,14 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         return jwt;
     }
     */
+
+    // Implemento metodos de JwtUtils para hacer uso de Swagger
     private String parseJwt(HttpServletRequest request) {
 
         String jwtFromCookie = jwtUtils.getJwtFromCookies(request);
         if(jwtFromCookie != null)
             return jwtFromCookie;
+
 
         String jwtFromHeader = jwtUtils.getJwtFromHeader(request);
         if(jwtFromHeader != null)

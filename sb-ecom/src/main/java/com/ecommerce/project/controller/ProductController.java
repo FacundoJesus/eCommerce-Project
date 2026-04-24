@@ -4,6 +4,7 @@ import com.ecommerce.project.config.AppConstants;
 import com.ecommerce.project.payload.ProductDTO;
 import com.ecommerce.project.payload.ProductResponse;
 import com.ecommerce.project.service.ProductService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 
+@Tag(name = "Products APIs", description = "APIs for managing products") //Swagger: Agrupar metodos
 @RestController
 @RequestMapping("/api")
 public class ProductController {

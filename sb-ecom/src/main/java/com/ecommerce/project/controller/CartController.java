@@ -6,6 +6,7 @@ import com.ecommerce.project.payload.ProductDTO;
 import com.ecommerce.project.repositories.iCartRepository;
 import com.ecommerce.project.service.CartService;
 import com.ecommerce.project.util.AuthUtil;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "Carts APIs", description = "APIs for managing carts") //Swagger: Agrupar metodos
 @RestController
 @RequestMapping("/api")
 public class CartController {
