@@ -29,11 +29,11 @@ public class CategoryService implements iCategoryService {
     @Override
     public CategoryResponse getAllCategories(Integer pageNumber, Integer pageSize,String sortBy, String sortOrder) {
 
-        //Ordenamiento
+        // Ordenamiento
         Sort sortByAndOrder = sortOrder.equalsIgnoreCase("asc")
                 ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
-        //Paginación
+        // Paginación
         Pageable pageDetails = PageRequest.of(pageNumber,pageSize, sortByAndOrder);
         Page<Category> categoryPage = categoryRepository.findAll(pageDetails);
 
@@ -46,7 +46,7 @@ public class CategoryService implements iCategoryService {
                 .map(category -> modelMapper.map(category,CategoryDTO.class))
                 .toList();
 
-        //Metadatos de paginación
+        // Metadatos de paginación
         CategoryResponse categoryResponse = new CategoryResponse();
 
         categoryResponse.setContent(categoryDTOS);
