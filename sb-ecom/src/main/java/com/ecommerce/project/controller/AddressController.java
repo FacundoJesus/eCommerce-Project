@@ -71,5 +71,4 @@ public class AddressController {
         return new ResponseEntity<>(message,HttpStatus.OK);
     }
 
-
 }
