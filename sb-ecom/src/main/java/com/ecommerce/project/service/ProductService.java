@@ -205,7 +205,7 @@ public class ProductService implements iProductService{
 
         productFromDb.setProductName(product.getProductName());
         productFromDb.setDescription(product.getDescription());
-        productFromDb.setImage("image.jpg");
+        productFromDb.setImage(product.getImage());
         productFromDb.setQuantity(product.getQuantity());
         productFromDb.setPrice(product.getPrice());
         productFromDb.setDiscount(product.getDiscount());
