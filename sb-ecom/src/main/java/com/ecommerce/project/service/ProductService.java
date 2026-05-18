@@ -49,6 +49,9 @@ public class ProductService implements iProductService{
     @Autowired
     iCartService cartService;
 
+    @Value("${image.base.url}")
+    private String imageBaseUrl;
+
 
     @Override
     public ProductDTO addProduct(Long categoryId, ProductDTO productDTO) {
@@ -102,8 +105,12 @@ public class ProductService implements iProductService{
             throw new APIException("No products created till now.");
 
         List<ProductDTO> productDTOS = products.stream()
-                .map(product -> modelMapper.map(product,ProductDTO.class))
-                        .toList();
+                .map(product -> {
+                    ProductDTO productDTO = modelMapper.map(product,ProductDTO.class);
+                    productDTO.setImage(constructImageUrl(product.getImage()));
+                    return productDTO;
+                })
+                .toList();
 
 
         ProductResponse productResponse = new ProductResponse();
@@ -117,6 +124,10 @@ public class ProductService implements iProductService{
 
         return productResponse;
 
+    }
+
+    private String constructImageUrl(String imageName) {
+        return (imageBaseUrl.endsWith("/")) ? (imageBaseUrl + imageName) : (imageBaseUrl+"/" + imageName);
     }
 
     @Override

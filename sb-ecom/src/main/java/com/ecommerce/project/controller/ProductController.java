@@ -66,7 +66,7 @@ public class ProductController {
     }
 
     @Operation(summary = "Update product", description = "API to Update one product")
-    @PutMapping("/admin/products/{productId}")
+    @PutMapping("/products/{productId}")
     public ResponseEntity<ProductDTO> updateProduct(@Valid @RequestBody ProductDTO productDTO,
                                                     @PathVariable Long productId) {
         ProductDTO updatedProductDTO = productService.updateProduct(productId, productDTO);
@@ -81,7 +81,7 @@ public class ProductController {
     }
 
     @Operation(summary = "Update product image", description = "API to Update product image")
-    @PutMapping("/products/{productId}/image")
+    @PutMapping("/admin/products/{productId}/image")
     public ResponseEntity<ProductDTO> updatedProductImage(@PathVariable Long productId,
                                                          @RequestParam ("image")MultipartFile image) throws IOException {
         ProductDTO updatedProduct = productService.updateProductImage(productId,image);
