@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -90,7 +91,8 @@ public class ProductService implements iProductService{
 
 
     @Override
-    public ProductResponse getAllProducts(Integer pageNumber, Integer pageSize,String sortBy,String sortOrder) {
+    public ProductResponse getAllProducts(Integer pageNumber, Integer pageSize,String sortBy,String sortOrder,
+                                          String keyword, String category) {
 
         // Ordenamiento
         Sort sortByAndOrder = sortOrder.equalsIgnoreCase("asc")
@@ -98,7 +100,26 @@ public class ProductService implements iProductService{
                 : Sort.by(sortBy).descending();
         // Paginación
         Pageable pageDetails = PageRequest.of(pageNumber,pageSize, sortByAndOrder);
-        Page<Product> pageProducts = productRepository.findAll(pageDetails);
+
+        //Agregado
+        Specification<Product> spec = (root, query, criteriaBuilder) ->
+                criteriaBuilder.conjunction();
+        if(keyword != null && !keyword.isEmpty()) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.like(
+                            criteriaBuilder.lower(root.get("productName")),
+                            "%" + keyword.toLowerCase() + "%"
+                    ));
+        }
+        if(category != null && !category.isEmpty()) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.like(
+                            criteriaBuilder.lower(root.get("category").get("categoryName")),
+                            "%" + category.toLowerCase() + "%"
+                    ));
+        }
+
+        Page<Product> pageProducts = productRepository.findAll(spec,pageDetails);
         List<Product> products = pageProducts.getContent();
 
         if(products.isEmpty())
