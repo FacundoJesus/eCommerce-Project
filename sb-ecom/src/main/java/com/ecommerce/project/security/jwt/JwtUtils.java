@@ -74,6 +74,7 @@ public class JwtUtils {
                 .path("/api")
                 .maxAge(24*60*60)//duracion x 1 dia
                 .httpOnly(false)
+                .secure(false)
                 .build();
 
         return cookie;
