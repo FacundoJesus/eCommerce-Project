@@ -2,6 +2,7 @@ package com.ecommerce.project.controller;
 
 import com.ecommerce.project.model.Cart;
 import com.ecommerce.project.payload.CartDTO;
+import com.ecommerce.project.payload.CartItemDTO;
 import com.ecommerce.project.payload.ProductDTO;
 import com.ecommerce.project.repositories.iCartRepository;
 import com.ecommerce.project.service.CartService;
@@ -31,10 +32,10 @@ public class CartController {
     iCartRepository cartRepository;
 
     @Operation(summary = "Add products to cart", description = "API to Add products to cart")
-    @PostMapping("/carts/products/{productId}/quantity/{quantity}")
-    public ResponseEntity<CartDTO> addProductToCart(@PathVariable Long productId, @PathVariable Integer quantity) {
-        CartDTO cartDTO = cartService.addProductToCart(productId,quantity);
-        return new ResponseEntity<CartDTO>(cartDTO, HttpStatus.CREATED);
+    @PostMapping("/cart/create")
+    public ResponseEntity<String> createOrUpdateCart(@RequestBody List<CartItemDTO> cartItems) {
+        String response = cartService.createOrUpdateCartWithItems(cartItems);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @Operation(summary = "Get all carts", description = "API to Get all carts")
