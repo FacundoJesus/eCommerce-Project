@@ -130,6 +130,13 @@
 			<version>3.0.2</version>
 		</dependency>
 
+		<!-- Dependencias Stripe -->
+		<dependency>
+			<groupId>com.stripe</groupId>
+			<artifactId>stripe-java</artifactId>
+			<version>32.2.0</version>
+		</dependency>
+
 
 	</dependencies>
 
