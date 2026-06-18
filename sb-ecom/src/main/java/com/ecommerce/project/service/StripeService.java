@@ -30,12 +30,15 @@ public class StripeService implements iStripeService {
     public PaymentIntent paymentIntent(StripePaymentDto stripePaymentDto) throws StripeException {
 
         Customer customer;
+
         // Retrieve and check if customer exist
         CustomerSearchParams searchParams =
                 CustomerSearchParams.builder()
                         .setQuery("email:'" + stripePaymentDto.getEmail() + "'")
                         .build();
         CustomerSearchResult customers = Customer.search(searchParams);
+
+
 
         if (customers.getData().isEmpty()) {
             // Create new customer
