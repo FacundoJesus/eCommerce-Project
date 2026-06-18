@@ -38,8 +38,6 @@ public class StripeService implements iStripeService {
                         .build();
         CustomerSearchResult customers = Customer.search(searchParams);
 
-
-
         if (customers.getData().isEmpty()) {
             // Create new customer
             CustomerCreateParams customerParams = CustomerCreateParams.builder()

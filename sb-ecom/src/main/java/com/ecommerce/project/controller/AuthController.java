@@ -88,7 +88,7 @@ public class AuthController {
 
         //Crear respuesta - DTO al Front
         UserInfoResponse response = new UserInfoResponse(userDetails.getId(),
-                                        userDetails.getUsername(),roles);
+                                        userDetails.getUsername(),userDetails.getEmail(),roles);
 
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE,
                 jwtCokie.toString())
