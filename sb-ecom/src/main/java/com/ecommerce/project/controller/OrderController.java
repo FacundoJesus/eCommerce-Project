@@ -2,8 +2,12 @@ package com.ecommerce.project.controller;
 
 import com.ecommerce.project.payload.OrderDTO;
 import com.ecommerce.project.payload.OrderRequestDTO;
+import com.ecommerce.project.payload.StripePaymentDto;
 import com.ecommerce.project.service.OrderService;
+import com.ecommerce.project.service.StripeService;
 import com.ecommerce.project.util.AuthUtil;
+import com.stripe.exception.StripeException;
+import com.stripe.model.PaymentIntent;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -23,6 +27,9 @@ public class OrderController {
     @Autowired
     private AuthUtil authUtil;
 
+    @Autowired
+    private StripeService stripeService;
+
     @Operation(summary = "Place a new order", description = "API place a new order")
     @PostMapping("/order/users/payments/{paymentMethod}")
     public ResponseEntity<OrderDTO> orderProducts(@Valid @PathVariable String paymentMethod,
@@ -40,5 +47,12 @@ public class OrderController {
         );
 
         return new ResponseEntity<>(orderDTO, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/order/stripe-client-secret")
+    public ResponseEntity<String> createStripeClientSecret(@RequestBody StripePaymentDto stripePaymentDto) throws StripeException {
+        PaymentIntent paymentIntent = stripeService.paymentIntent(stripePaymentDto);
+
+        return new ResponseEntity<>(paymentIntent.getClientSecret(), HttpStatus.CREATED);
     }
 }
