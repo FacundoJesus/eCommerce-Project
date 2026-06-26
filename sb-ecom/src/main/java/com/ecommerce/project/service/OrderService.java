@@ -155,4 +155,17 @@ public class OrderService implements iOrderService {
 
         return orderResponse;
     }
+
+    @Override
+    public OrderDTO updateOrder(Long orderId, String status) {
+
+        Order order = orderRepository.findById(orderId)
+                        .orElseThrow(() -> new ResourceNotFoundException("Order","orderId",orderId));
+
+        order.setOrderStatus(status);
+
+        orderRepository.save(order);
+
+        return modelMapper.map(order, OrderDTO.class);
+    }
 }
