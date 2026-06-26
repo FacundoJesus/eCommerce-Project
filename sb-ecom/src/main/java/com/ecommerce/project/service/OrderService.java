@@ -70,7 +70,7 @@ public class OrderService implements iOrderService {
         order.setEmail(emailId);
         order.setOrderDate((LocalDate.now()));
         order.setTotalAmount(cart.getTotalPrice());
-        order.setOrderStatus("Order Accepted!");
+        order.setOrderStatus("Accepted");
         order.setAddress(address);
 
         Payment payment = new Payment(paymentMethod, pgPaymentId, pgStatus, pgResponseMessage,pgName);

@@ -73,8 +73,9 @@ public class JwtUtils {
         ResponseCookie cookie = ResponseCookie.from(jwtCookie,jwt)
                 .path("/api")
                 .maxAge(24*60*60)//duracion x 1 dia
-                .httpOnly(false)
+                .httpOnly(true)
                 .secure(false)
+                .sameSite("Lax")
                 .build();
 
         return cookie;
