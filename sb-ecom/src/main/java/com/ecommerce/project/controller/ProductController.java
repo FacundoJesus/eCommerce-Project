@@ -69,7 +69,7 @@ public class ProductController {
     }
 
     @Operation(summary = "Update product", description = "API to Update one product")
-    @PutMapping("/products/{productId}")
+    @PutMapping("/admin/products/{productId}")
     public ResponseEntity<ProductDTO> updateProduct(@Valid @RequestBody ProductDTO productDTO,
                                                     @PathVariable Long productId) {
         ProductDTO updatedProductDTO = productService.updateProduct(productId, productDTO);
