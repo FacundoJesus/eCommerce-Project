@@ -49,7 +49,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content)
     }) //Swagger: Posibles respuestas.
     @Parameter(description = "Category that you wish to create")
-    @PostMapping("/public/categories")
+    @PostMapping("/admin/categories")
     public ResponseEntity<CategoryDTO> createCategory(@Valid @RequestBody CategoryDTO categoryDTO) {
         CategoryDTO savedCategoryDTO = categoryService.createCategory(categoryDTO);
         return new ResponseEntity<>(savedCategoryDTO, HttpStatus.CREATED);
@@ -57,7 +57,7 @@ public class CategoryController {
 
 
     @Operation(summary = "Update category", description = "API to update the existing category")
-    @PutMapping("/public/categories/{categoryId}")
+    @PutMapping("/admin/categories/{categoryId}")
     public ResponseEntity<CategoryDTO> updateCategory(@Valid @RequestBody CategoryDTO categoryDTO,
                                                       @PathVariable Long categoryId) {
         CategoryDTO updatedCategoryDTO = categoryService.updateCategory(categoryDTO,categoryId);
