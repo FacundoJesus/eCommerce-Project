@@ -4,6 +4,8 @@ import com.ecommerce.project.model.AppRole;
 import com.ecommerce.project.model.Role;
 import com.ecommerce.project.model.User;
 import com.ecommerce.project.payload.AuthenticationResult;
+import com.ecommerce.project.payload.UserDTO;
+import com.ecommerce.project.payload.UserResponse;
 import com.ecommerce.project.repositories.iRoleRepository;
 import com.ecommerce.project.repositories.iUserRepository;
 import com.ecommerce.project.security.jwt.JwtUtils;
@@ -13,7 +15,10 @@ import com.ecommerce.project.security.response.MessageResponse;
 import com.ecommerce.project.security.response.UserInfoResponse;
 import com.ecommerce.project.security.services.UserDetailsImpl;
 import jakarta.transaction.Transactional;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -45,6 +50,9 @@ public class AuthService implements iAuthService {
     private iRoleRepository roleRepository;
     @Autowired
     private iUserRepository userRepository;
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Override
     public AuthenticationResult login(LoginRequest loginRequest) {
@@ -144,5 +152,26 @@ public class AuthService implements iAuthService {
     @Override
     public ResponseCookie logoutUser() {
         return jwtUtils.getCleanJwtCookie();
+    }
+
+    @Override
+    public UserResponse getAllSellers(Pageable pageDetails) {
+
+        Page<User> allUsers = userRepository.findByRoleName(AppRole.ROLE_SELLER, pageDetails);
+
+        List<UserDTO> userDTOS = allUsers.getContent()
+                .stream()
+                .map(u-> modelMapper.map(u, UserDTO.class))
+                .toList();
+
+        UserResponse response = new UserResponse();
+        response.setContent(userDTOS);
+        response.setPageNumber(allUsers.getNumber());
+        response.setPageSize(allUsers.getSize());
+        response.setTotalElements(allUsers.getTotalElements());
+        response.setTotalPages(allUsers.getTotalPages());
+        response.setLastPage(allUsers.isLast());
+
+        return response;
     }
 }
