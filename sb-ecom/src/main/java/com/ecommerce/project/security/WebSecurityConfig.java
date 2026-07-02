@@ -77,6 +77,7 @@ public class WebSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http.csrf(csrf -> csrf.disable())
+                .cors(cors -> {})
                 .exceptionHandling(exception -> //Manejo de excepciones
                         exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement( session -> //No usa sesiones, todo se basa en JWT
@@ -102,7 +103,7 @@ public class WebSecurityConfig {
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
         //AGREGADO
-        http.cors(Customizer.withDefaults());
+        //http.cors(Customizer.withDefaults());
 
         //Permite usar H2 console
         http.headers(headers->

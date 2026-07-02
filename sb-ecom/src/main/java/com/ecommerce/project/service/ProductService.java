@@ -12,6 +12,7 @@ import com.ecommerce.project.payload.ProductResponse;
 import com.ecommerce.project.repositories.iCartRepository;
 import com.ecommerce.project.repositories.iCategoryRepository;
 import com.ecommerce.project.repositories.iProductRepository;
+import com.ecommerce.project.util.AuthUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,6 +54,8 @@ public class ProductService implements iProductService{
     @Value("${image.base.url}")
     private String imageBaseUrl;
 
+    @Autowired
+    private AuthUtil authUtil;
 
     @Override
     public ProductDTO addProduct(Long categoryId, ProductDTO productDTO) {
@@ -75,6 +78,7 @@ public class ProductService implements iProductService{
 
             product.setImage("image.jpg");
             product.setCategory(category);
+            product.setUser(authUtil.loggedInUser());
 
             double specialPrice = product.getPrice() * (1 - product.getDiscount() / 100.0);
 
