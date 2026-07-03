@@ -32,6 +32,13 @@ public class ProductController {
         ProductDTO savedProductDTO = productService.addProduct(categoryId,productDTO);
         return new ResponseEntity<>(savedProductDTO,HttpStatus.CREATED);
     }
+    @PostMapping("/seller/categories/{categoryId}/product")
+    public ResponseEntity<ProductDTO> addProductForSeller(@Valid @RequestBody ProductDTO productDTO,
+                                                 @PathVariable Long categoryId) {
+
+        ProductDTO savedProductDTO = productService.addProduct(categoryId,productDTO);
+        return new ResponseEntity<>(savedProductDTO,HttpStatus.CREATED);
+    }
 
     @Operation(summary = "Get All products", description = "API to Get all products")
     @GetMapping("/public/products")
@@ -75,10 +82,22 @@ public class ProductController {
         ProductDTO updatedProductDTO = productService.updateProduct(productId, productDTO);
         return new ResponseEntity<>(updatedProductDTO,HttpStatus.OK);
     }
+    @PutMapping("/seller/products/{productId}")
+    public ResponseEntity<ProductDTO> updateProductForSeller(@Valid @RequestBody ProductDTO productDTO,
+                                                    @PathVariable Long productId) {
+        ProductDTO updatedProductDTO = productService.updateProduct(productId, productDTO);
+        return new ResponseEntity<>(updatedProductDTO,HttpStatus.OK);
+    }
 
     @Operation(summary = "Delete product by Id", description = "API to Delete product by Id")
     @DeleteMapping("/admin/products/{productId}")
     public ResponseEntity<ProductDTO> deleteProduct(@PathVariable Long productId) {
+        ProductDTO deletedProduct = productService.deleteProduct(productId);
+        return new ResponseEntity<>(deletedProduct,HttpStatus.OK);
+    }
+    @Operation(summary = "Delete product by Id", description = "API to Delete product by Id")
+    @DeleteMapping("/seller/products/{productId}")
+    public ResponseEntity<ProductDTO> deleteProductForSeller(@PathVariable Long productId) {
         ProductDTO deletedProduct = productService.deleteProduct(productId);
         return new ResponseEntity<>(deletedProduct,HttpStatus.OK);
     }
@@ -87,6 +106,12 @@ public class ProductController {
     @PutMapping("/admin/products/{productId}/image")
     public ResponseEntity<ProductDTO> updatedProductImage(@PathVariable Long productId,
                                                          @RequestParam ("image")MultipartFile image) throws IOException {
+        ProductDTO updatedProduct = productService.updateProductImage(productId,image);
+        return new ResponseEntity<>(updatedProduct,HttpStatus.OK);
+    }
+    @PutMapping("/seller/products/{productId}/image")
+    public ResponseEntity<ProductDTO> updatedProductImageForSeller(@PathVariable Long productId,
+                                                          @RequestParam ("image")MultipartFile image) throws IOException {
         ProductDTO updatedProduct = productService.updateProductImage(productId,image);
         return new ResponseEntity<>(updatedProduct,HttpStatus.OK);
     }
@@ -100,7 +125,6 @@ public class ProductController {
         ProductResponse productResponse = productService.getAllProductsForAdmin(pageNumber,pageSize,sortBy,sortOrder);
         return new ResponseEntity<>(productResponse,HttpStatus.OK);
     }
-
     @GetMapping("/seller/products")
     public ResponseEntity<ProductResponse> getAllProductsForSeller(
             @RequestParam(name = "pageNumber",defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
