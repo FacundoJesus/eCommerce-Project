@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import ProductCard from "../shared/ProductCard";
-import HeroBanner from "./heroBanner";
+import HeroBanner from "./HeroBanner";
 import { useEffect } from "react";
 import { fetchProducts } from "../../store/actions/actions";
 import Loader from "../shared/Loader";
