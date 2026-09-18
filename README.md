@@ -103,11 +103,11 @@ cd eCommerce-Project
 
 | Landing Page | Catálogo de Productos |
 | :---: | :---: |
-| <img src="https://via.placeholder.com/400x250.png?text=Landing+Page+Screenshot" alt="Landing Page" width="100%"> | <img src="https://via.placeholder.com/400x250.png?text=Catalogo+Screenshot" alt="Catálogo" width="100%"> |
+| <img src="./assets/homePage.jpg" alt="Landing Page" width="100%"> | <img src="./assets/catalogoProductos.jpg" alt="Catálogo" width="100%"> |
 
 | Carrito de Compras | Panel de Administración |
 | :---: | :---: |
-| <img src="https://via.placeholder.com/400x250.png?text=Carrito+Screenshot" alt="Carrito" width="100%"> | <img src="https://via.placeholder.com/400x250.png?text=Admin+Dashboard+Screenshot" alt="Dashboard" width="100%"> |
+| <img src="./assets/carrito.jpg" alt="Carrito" width="100%"> | <img src="./assets/adminPanel.jpg" alt="Dashboard" width="100%"> |
 
 ## 🎯 Conclusiones y Aprendizajes
 
