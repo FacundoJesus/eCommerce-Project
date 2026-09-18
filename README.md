@@ -101,8 +101,6 @@ cd eCommerce-Project
 
 ## 📸 Vistas de la Aplicación
 
-> 💡 **Nota para el portfolio:** Reemplaza estos espacios con imágenes o GIFs reales de tu proyecto.
-
 | Landing Page | Catálogo de Productos |
 | :---: | :---: |
 | <img src="https://via.placeholder.com/400x250.png?text=Landing+Page+Screenshot" alt="Landing Page" width="100%"> | <img src="https://via.placeholder.com/400x250.png?text=Catalogo+Screenshot" alt="Catálogo" width="100%"> |
@@ -123,7 +121,7 @@ La creación de este eCommerce me permitió afianzar conocimientos avanzados en 
 ---
 
 <p align="center">
-  Desarrollado por <a href="https://github.com/tu-usuario">Tu Nombre</a> 👨‍💻
+  Desarrollado por <a href="https://github.com/FacundoJesus">Facundo</a> 👨‍💻
   <br/>
   Si te gustó el proyecto no olvides dejar una ⭐
 </p>
