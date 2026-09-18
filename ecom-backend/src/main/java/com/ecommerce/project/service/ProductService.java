@@ -127,8 +127,7 @@ public class ProductService implements iProductService{
         Page<Product> pageProducts = productRepository.findAll(spec,pageDetails);
         List<Product> products = pageProducts.getContent();
 
-        if(products.isEmpty())
-            throw new APIException("No products created till now.");
+
 
         List<ProductDTO> productDTOS = products.stream()
                 .map(product -> {
@@ -174,8 +173,7 @@ public class ProductService implements iProductService{
         Page<Product> pageProducts = productRepository.findByCategoryOrderByPriceAsc(category,pageDetails);
         List<Product> products = pageProducts.getContent();
 
-        if(products.isEmpty())
-            throw new APIException("No products created till now.");
+
 
         List<ProductDTO> productDTOS = products.stream()
                 .map(product -> modelMapper.map(product,ProductDTO.class))
@@ -204,8 +202,7 @@ public class ProductService implements iProductService{
         Page<Product> pageProducts = productRepository.findByProductNameLikeIgnoreCase('%' + keyword + '%', pageDetails);
         List<Product> products = pageProducts.getContent();
 
-        if(products.isEmpty())
-            throw new APIException("Products not found with keyword: " + keyword);
+
 
         List<ProductDTO> productDTOS = products.stream()
                 .map(product -> modelMapper.map(product,ProductDTO.class))
@@ -311,8 +308,7 @@ public class ProductService implements iProductService{
         Page<Product> pageProducts = productRepository.findAll(pageDetails);
         List<Product> products = pageProducts.getContent();
 
-        if(products.isEmpty())
-            throw new APIException("No products created till now.");
+
 
         List<ProductDTO> productDTOS = products.stream()
                 .map(product -> {
@@ -347,8 +343,7 @@ public class ProductService implements iProductService{
         Page<Product> pageProducts = productRepository.findByUser(user, pageDetails);
         List<Product> products = pageProducts.getContent();
 
-        if(products.isEmpty())
-            throw new APIException("No products created till now.");
+
 
         List<ProductDTO> productDTOS = products.stream()
                 .map(product -> {
