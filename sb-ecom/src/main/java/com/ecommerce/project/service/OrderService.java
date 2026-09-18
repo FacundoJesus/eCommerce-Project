@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class OrderService implements iOrderService {
@@ -51,21 +50,19 @@ public class OrderService implements iOrderService {
     @Autowired
     private ModelMapper modelMapper;
 
-
     @Override
     @Transactional
     public OrderDTO placeOrder(String emailId, Long addressId, String paymentMethod,
-                               String pgName, String pgPaymentId, String pgStatus,
-                               String pgResponseMessage) {
+            String pgName, String pgPaymentId, String pgStatus,
+            String pgResponseMessage) {
 
         // Obtener el carrito del usuario
         Cart cart = cartRepository.findCartByEmail(emailId);
-        if(cart == null)
-            throw new ResourceNotFoundException("Cart","emailId",emailId);
+        if (cart == null)
+            throw new ResourceNotFoundException("Cart", "emailId", emailId);
 
         Address address = addressRepository.findById(addressId)
-                .orElseThrow(() -> new ResourceNotFoundException("Adress","addressId",addressId));
-
+                .orElseThrow(() -> new ResourceNotFoundException("Adress", "addressId", addressId));
 
         // Crear una nueva orden con la informacion del pago
         Order order = new Order();
@@ -75,7 +72,7 @@ public class OrderService implements iOrderService {
         order.setOrderStatus("Accepted");
         order.setAddress(address);
 
-        Payment payment = new Payment(paymentMethod, pgPaymentId, pgStatus, pgResponseMessage,pgName);
+        Payment payment = new Payment(paymentMethod, pgPaymentId, pgStatus, pgResponseMessage, pgName);
         payment.setOrder(order);
         payment = paymentRepository.save(payment);
 
@@ -85,11 +82,11 @@ public class OrderService implements iOrderService {
 
         // Transformar los artículos del carrito en artículos del pedido.
         List<CartItem> cartItems = cart.getCartItems();
-        if(cartItems.isEmpty())
+        if (cartItems.isEmpty())
             throw new APIException("The Cart is empty");
 
         List<OrderItem> orderItems = new ArrayList<>();
-        for(CartItem item : cartItems) {
+        for (CartItem item : cartItems) {
             OrderItem orderItem = new OrderItem();
             orderItem.setProduct(item.getProduct());
             orderItem.setQuantity(item.getQuantity());
@@ -102,24 +99,23 @@ public class OrderService implements iOrderService {
 
         orderItems = orderItemsRepository.saveAll(orderItems);
 
-        //--------POST ORDEN---------
-        //Actualizar el Stock de Productos
-        cart.getCartItems().forEach( item -> {
+        // --------POST ORDEN---------
+        // Actualizar el Stock de Productos
+        cart.getCartItems().forEach(item -> {
             int quantity = item.getQuantity();
             Product product = item.getProduct();
             product.setQuantity(product.getQuantity() - quantity);
             productRepository.save(product);
 
-            //Limpiar el Carrito
-            cartService.deleteProductFromCart(cart.getCartId(),item.getProduct().getProductId());
+            // Limpiar el Carrito
+            cartService.deleteProductFromCart(cart.getCartId(), item.getProduct().getProductId());
         });
 
-        //Guardar la orden summary
+        // Guardar la orden summary
         OrderDTO orderDTO = modelMapper.map(savedOrder, OrderDTO.class);
 
-        orderItems.forEach(item ->
-                orderDTO.getOrderItems().add(
-                        modelMapper.map(item, OrderItemDTO.class)));
+        orderItems.forEach(item -> orderDTO.getOrderItems().add(
+                modelMapper.map(item, OrderItemDTO.class)));
 
         orderDTO.setAddressId(addressId);
 
@@ -134,9 +130,9 @@ public class OrderService implements iOrderService {
                 ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
         // Paginación
-        Pageable pageDetails = PageRequest.of(pageNumber,pageSize, sortByAndOrder);
+        Pageable pageDetails = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
 
-        //Obtengo la pagina ordenada de todas las ordenes
+        // Obtengo la pagina ordenada de todas las ordenes
         Page<Order> pageOrders = orderRepository.findAll(pageDetails);
 
         // Obtengo la lista de ordenes de la pagina ordenada
@@ -146,7 +142,7 @@ public class OrderService implements iOrderService {
                 .map(order -> modelMapper.map(order, OrderDTO.class))
                 .toList();
 
-        //Creo la instancia de respuesta OrderResponse
+        // Creo la instancia de respuesta OrderResponse
         OrderResponse orderResponse = new OrderResponse();
         orderResponse.setContent(orderDTOs);
         orderResponse.setPageNumber(pageOrders.getNumber());
@@ -162,7 +158,7 @@ public class OrderService implements iOrderService {
     public OrderDTO updateOrder(Long orderId, String status) {
 
         Order order = orderRepository.findById(orderId)
-                        .orElseThrow(() -> new ResourceNotFoundException("Order","orderId",orderId));
+                .orElseThrow(() -> new ResourceNotFoundException("Order", "orderId", orderId));
 
         order.setOrderStatus(status);
 
@@ -178,18 +174,17 @@ public class OrderService implements iOrderService {
                 ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
 
-        Pageable pageDetails = PageRequest.of(pageNumber,pageSize, sortByAndOrder);
+        Pageable pageDetails = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
 
         User seller = authUtil.loggedInUser();
         Page<Order> pageOrders = orderRepository.findAll(pageDetails);
 
-
-        //Filtrar y obtener los pedidos asociados al vendedor logueado
+        // Filtrar y obtener los pedidos asociados al vendedor logueado
         List<Order> sellerOrders = pageOrders.getContent().stream()
                 .filter(order -> order.getOrderItems().stream()
                         .anyMatch(orderItem -> {
                             var product = orderItem.getProduct();
-                            if(product == null || product.getUser() == null) {
+                            if (product == null || product.getUser() == null) {
                                 return false;
                             }
                             return product.getUser().getUserId().equals(
@@ -197,11 +192,9 @@ public class OrderService implements iOrderService {
                         }))
                 .toList();
 
-
         List<OrderDTO> orderDTOs = sellerOrders.stream()
                 .map(order -> modelMapper.map(order, OrderDTO.class))
                 .toList();
-
 
         OrderResponse orderResponse = new OrderResponse();
         orderResponse.setContent(orderDTOs);

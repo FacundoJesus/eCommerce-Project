@@ -15,7 +15,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -29,9 +28,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import java.util.Set;
 
-@Configuration //Clase de Configuracion
-@EnableWebSecurity //Activa Spring Security
-//@EnableMethodSecurity
+@Configuration // Clase de Configuracion
+@EnableWebSecurity // Activa Spring Security
+// @EnableMethodSecurity
 public class WebSecurityConfig {
 
     @Autowired
@@ -41,17 +40,18 @@ public class WebSecurityConfig {
     private AuthEntryPointJwt unauthorizedHandler;
 
     @Bean
-    /**Registrás tu filtro personalizado
-     lee cookie
-     valida JWT
-     autentica usuario
+    /**
+     * Registrás tu filtro personalizado
+     * lee cookie
+     * valida JWT
+     * autentica usuario
      */
     public AuthTokenFilter authenticationJwtTokenFilter() {
         return new AuthTokenFilter();
     }
 
     @Bean
-    //Usa mi BD para autenticar usuarios
+    // Usa mi BD para autenticar usuarios
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider(userDetailsService);
         authenticationProvider.setPasswordEncoder(passwordEncoder());
@@ -59,62 +59,60 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    //Maneja el login, se usa en el controller
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration  authConfig) throws Exception {
+    // Maneja el login, se usa en el controller
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
     }
 
-
     @Bean
-    //Encripta passwords
+    // Encripta passwords
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    //LO MAS IMPORTANTE
-    //Configuracion de todo el comportamiento.
+    // LO MAS IMPORTANTE
+    // Configuracion de todo el comportamiento.
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http.csrf(csrf -> csrf.disable())
-                .cors(cors -> {})
-                .exceptionHandling(exception -> //Manejo de excepciones
-                        exception.authenticationEntryPoint(unauthorizedHandler))
-                .sessionManagement( session -> //No usa sesiones, todo se basa en JWT
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> //Autorizaciones de ruta
-                        auth.requestMatchers("/api/auth/**").permitAll()
-                                .requestMatchers("/v3/api-docs/**").permitAll()
-                                .requestMatchers("/h2-console/**").permitAll()
-                                .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                                .requestMatchers("/api/seller/**").hasAnyRole("ADMIN","SELLER")
-                                //.requestMatchers("/api/admin/**").permitAll()
-                                .requestMatchers("/api/public/**").permitAll()
-                                .requestMatchers("/swagger-ui/**").permitAll()
-                                .requestMatchers("/api/test/**").permitAll()
-                                .requestMatchers("/images/**").permitAll()
-                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .cors(cors -> {
+                })
+                .exceptionHandling(exception -> // Manejo de excepciones
+                exception.authenticationEntryPoint(unauthorizedHandler))
+                .sessionManagement(session -> // No usa sesiones, todo se basa en JWT
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> // Autorizaciones de ruta
+                auth.requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/v3/api-docs/**").permitAll()
+                        .requestMatchers("/h2-console/**").permitAll()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/seller/**").hasAnyRole("ADMIN", "SELLER")
+                        // .requestMatchers("/api/admin/**").permitAll()
+                        .requestMatchers("/api/public/**").permitAll()
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/api/test/**").permitAll()
+                        .requestMatchers("/images/**").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        .anyRequest().authenticated()); //El resto requiere Loggin
+                        .anyRequest().authenticated()); // El resto requiere Loggin
 
-        //Conectar provider
+        // Conectar provider
         http.authenticationProvider(authenticationProvider());
-        //Agregar filtro JWT antes del login de Spring
+        // Agregar filtro JWT antes del login de Spring
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
-        //AGREGADO
-        //http.cors(Customizer.withDefaults());
+        // AGREGADO
+        // http.cors(Customizer.withDefaults());
 
-        //Permite usar H2 console
-        http.headers(headers->
-                headers.frameOptions(frameOptionsConfig -> frameOptionsConfig.sameOrigin()));
+        // Permite usar H2 console
+        http.headers(headers -> headers.frameOptions(frameOptionsConfig -> frameOptionsConfig.sameOrigin()));
 
         return http.build();
     }
 
-
     @Bean
-    //Ignora seguridad en rutas
+    // Ignora seguridad en rutas
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web -> web.ignoring()
                 .requestMatchers("/v2/api-docs",
@@ -125,11 +123,10 @@ public class WebSecurityConfig {
                         "/webjars/**"));
     }
 
-
-
-    //Metodo para inicializar la base de datos. - Se ejecuta al iniciar la app
+    // Metodo para inicializar la base de datos. - Se ejecuta al iniciar la app
     @Bean
-    public CommandLineRunner initData(iRoleRepository roleRepository, iUserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public CommandLineRunner initData(iRoleRepository roleRepository, iUserRepository userRepository,
+            PasswordEncoder passwordEncoder) {
         return args -> {
 
             // Crear Roles
@@ -154,7 +151,6 @@ public class WebSecurityConfig {
             Set<Role> userRoles = Set.of(userRole);
             Set<Role> sellerRoles = Set.of(sellerRole);
             Set<Role> adminRoles = Set.of(userRole, sellerRole, adminRole);
-
 
             // Crear usuarios si no existen
             if (!userRepository.existsByUserName("user1")) {

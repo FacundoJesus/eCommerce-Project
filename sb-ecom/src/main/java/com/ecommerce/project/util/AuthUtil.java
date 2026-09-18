@@ -2,7 +2,6 @@ package com.ecommerce.project.util;
 
 import com.ecommerce.project.model.User;
 import com.ecommerce.project.repositories.iUserRepository;
-import org.hibernate.service.UnknownServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

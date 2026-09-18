@@ -4,9 +4,6 @@ import com.ecommerce.project.model.Address;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
-public interface iAddressRepository extends JpaRepository<Address,Long> {
-
+public interface iAddressRepository extends JpaRepository<Address, Long> {
 }

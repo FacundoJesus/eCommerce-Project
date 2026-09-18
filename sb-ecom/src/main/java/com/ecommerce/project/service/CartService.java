@@ -18,12 +18,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
-public class CartService implements iCartService{
+public class CartService implements iCartService {
 
     @Autowired
     iCartRepository cartRepository;
@@ -40,22 +39,19 @@ public class CartService implements iCartService{
     @Autowired
     private ModelMapper modelMapper;
 
-
-
-
     @Override
     public CartDTO addProductToCart(Long productId, Integer quantity) {
 
         Cart cart = createCart();
 
         Product product = productRepository.findById(productId)
-                .orElseThrow(()-> new ResourceNotFoundException("Product","productId", productId));
+                .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
 
-        CartItem cartItem = cartItemRepository.findCartItemByProductIdAndCartId( cart.getCartId(), productId);
+        CartItem cartItem = cartItemRepository.findCartItemByProductIdAndCartId(cart.getCartId(), productId);
 
-        if(cartItem != null)
+        if (cartItem != null)
             throw new APIException("Product " + product.getProductName() + " already exists in the cart.");
-        if(product.getQuantity() == 0)
+        if (product.getQuantity() == 0)
             throw new APIException(product.getProductName() + " is not available.");
         if (product.getQuantity() < quantity)
             throw new APIException("Please, make an order of the " + product.getProductName() +
@@ -79,7 +75,7 @@ public class CartService implements iCartService{
 
         List<CartItem> cartItems = cart.getCartItems();
 
-        Stream<ProductDTO> productStream = cartItems.stream().map( item -> {
+        Stream<ProductDTO> productStream = cartItems.stream().map(item -> {
             ProductDTO map = modelMapper.map(item.getProduct(), ProductDTO.class);
             map.setQuantity(item.getQuantity());
             return map;
@@ -95,11 +91,12 @@ public class CartService implements iCartService{
 
         List<Cart> carts = cartRepository.findAll();
 
-        if(carts.isEmpty())
+        if (carts.isEmpty())
             throw new APIException("No cart exists.");
 
         List<CartDTO> cartDTOs = carts.stream()
-                .map(cart -> {CartDTO cartDTO = modelMapper.map(cart,CartDTO.class);
+                .map(cart -> {
+                    CartDTO cartDTO = modelMapper.map(cart, CartDTO.class);
 
                     List<ProductDTO> products = cart.getCartItems().stream().map(cartItem -> {
                         ProductDTO productDTO = modelMapper.map(cartItem.getProduct(), ProductDTO.class);
@@ -107,8 +104,8 @@ public class CartService implements iCartService{
                         return productDTO;
                     }).collect(Collectors.toList());
 
-                cartDTO.setProducts(products);
-                return cartDTO;
+                    cartDTO.setProducts(products);
+                    return cartDTO;
                 }).collect(Collectors.toList());
 
         return cartDTOs;
@@ -117,14 +114,14 @@ public class CartService implements iCartService{
     @Override
     public CartDTO getCart(String emailId, Long cartId) {
 
-        Cart cart = cartRepository.findCartByEmailAndCartId(emailId,cartId);
+        Cart cart = cartRepository.findCartByEmailAndCartId(emailId, cartId);
 
-        if(cart == null)
+        if (cart == null)
             throw new ResourceNotFoundException("Cart", "cartId", cartId);
 
-        CartDTO cartDTO = modelMapper.map(cart,CartDTO.class);
+        CartDTO cartDTO = modelMapper.map(cart, CartDTO.class);
 
-        cart.getCartItems().forEach(c->c.getProduct().setQuantity(c.getQuantity()));
+        cart.getCartItems().forEach(c -> c.getProduct().setQuantity(c.getQuantity()));
 
         List<ProductDTO> productsDTO = cart.getCartItems().stream()
                 .map(p -> modelMapper.map(p.getProduct(), ProductDTO.class))
@@ -135,7 +132,6 @@ public class CartService implements iCartService{
         return cartDTO;
     }
 
-
     @Transactional
     @Override
     public CartDTO updateProductQuantityinCart(Long productId, Integer quantity) {
@@ -145,30 +141,30 @@ public class CartService implements iCartService{
         Long cartId = useCart.getCartId();
 
         Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new ResourceNotFoundException("Cart","cartId",cartId));
+                .orElseThrow(() -> new ResourceNotFoundException("Cart", "cartId", cartId));
 
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product","productId",productId));
+                .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
 
-        if(product.getQuantity() == 0)
+        if (product.getQuantity() == 0)
             throw new APIException(product.getProductName() + " is not available.");
         if (product.getQuantity() < quantity)
             throw new APIException("Please, make an order of the " + product.getProductName() +
                     "less than or equal to the quantity " + product.getQuantity() + ".");
 
-        CartItem cartItem = cartItemRepository.findCartItemByProductIdAndCartId(cartId,productId);
+        CartItem cartItem = cartItemRepository.findCartItemByProductIdAndCartId(cartId, productId);
 
-        if(cartItem == null) {
+        if (cartItem == null) {
             throw new APIException("Product " + product.getProductName() + " Not available in the Cart.");
         }
 
-        //Calcular nueva cantidad
+        // Calcular nueva cantidad
         int newQuantity = cartItem.getQuantity() + quantity;
-        //Validar cantidad negativa
+        // Validar cantidad negativa
         if (newQuantity < 0)
             throw new APIException("The resulting quantity cannot be negative.");
 
-        if(newQuantity == 0)
+        if (newQuantity == 0)
 
             deleteProductFromCart(cartId, productId);
         else {
@@ -182,14 +178,14 @@ public class CartService implements iCartService{
         }
 
         CartItem updatedItem = cartItemRepository.save(cartItem);
-        if(updatedItem.getQuantity() == 0) {
+        if (updatedItem.getQuantity() == 0) {
             cartItemRepository.deleteById(updatedItem.getCartItemId());
         }
 
         CartDTO cartDTO = modelMapper.map(cart, CartDTO.class);
         List<CartItem> cartItems = cart.getCartItems();
 
-        Stream<ProductDTO> productDTOStream = cartItems.stream().map( item -> {
+        Stream<ProductDTO> productDTOStream = cartItems.stream().map(item -> {
             ProductDTO productDto = modelMapper.map(item.getProduct(), ProductDTO.class);
             productDto.setQuantity(item.getQuantity());
             return productDto;
@@ -205,17 +201,16 @@ public class CartService implements iCartService{
     public String deleteProductFromCart(Long cartId, Long productId) {
 
         Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new ResourceNotFoundException("Cart","cartId",cartId));
+                .orElseThrow(() -> new ResourceNotFoundException("Cart", "cartId", cartId));
 
-
-        CartItem cartItem = cartItemRepository.findCartItemByProductIdAndCartId(cartId,productId);
-        if(cartItem == null) {
-            throw new ResourceNotFoundException("Product","productId",productId);
+        CartItem cartItem = cartItemRepository.findCartItemByProductIdAndCartId(cartId, productId);
+        if (cartItem == null) {
+            throw new ResourceNotFoundException("Product", "productId", productId);
         }
 
         cart.setTotalPrice(cart.getTotalPrice() - (cartItem.getProductPrice() * cartItem.getQuantity()));
 
-        cartItemRepository.deleteCartItemByProductIdAndCartId(cartId,productId);
+        cartItemRepository.deleteCartItemByProductIdAndCartId(cartId, productId);
 
         return "Product " + cartItem.getProduct().getProductName() + " removed from the cart.";
 
@@ -224,24 +219,24 @@ public class CartService implements iCartService{
     @Override
     public void updateProductInCarts(Long cartId, Long productId) {
 
-        //Validaciones
+        // Validaciones
         Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new ResourceNotFoundException("Cart","cartId",cartId));
+                .orElseThrow(() -> new ResourceNotFoundException("Cart", "cartId", cartId));
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product","productId",productId));
+                .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
 
-        CartItem cartItem = cartItemRepository.findCartItemByProductIdAndCartId(cartId,productId);
-        if(cartItem == null) {
+        CartItem cartItem = cartItemRepository.findCartItemByProductIdAndCartId(cartId, productId);
+        if (cartItem == null) {
             throw new APIException("Product " + product.getProductName() + " not available in the cart.");
         }
 
-        //1000 - 100*2 = 800
+        // 1000 - 100*2 = 800
         double cartPrice = cart.getTotalPrice() - (cartItem.getProductPrice() * cartItem.getQuantity());
 
-        //200
+        // 200
         cartItem.setProductPrice(product.getSpecialPrice());
 
-        //800 + (200*2) = 1200
+        // 800 + (200*2) = 1200
         cart.setTotalPrice(cartPrice +
                 (cartItem.getProductPrice() * cartItem.getQuantity()));
 
@@ -278,7 +273,7 @@ public class CartService implements iCartService{
                     .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
 
             // Directly update product stock and total price
-            //product.setQuantity(product.getQuantity() - quantity);
+            // product.setQuantity(product.getQuantity() - quantity);
             totalPrice += product.getSpecialPrice() * quantity;
 
             // Create and save cart item
@@ -297,11 +292,10 @@ public class CartService implements iCartService{
         return "Cart created/updated with the new items successfully";
     }
 
-
-    //Crear carro
+    // Crear carro
     private Cart createCart() {
         Cart userCart = cartRepository.findCartByEmail((authUtil.loggedInEmail()));
-        if(userCart != null)
+        if (userCart != null)
             return userCart;
 
         Cart cart = new Cart();

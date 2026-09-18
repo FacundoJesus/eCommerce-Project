@@ -16,7 +16,8 @@ import java.util.stream.Collectors;
 
 @NoArgsConstructor
 @Data
-//Clase que utilizada como puente entre la entidad User y UserDetails de Spring Security
+// Clase que utilizada como puente entre la entidad User y UserDetails de Spring
+// Security
 public class UserDetailsImpl implements UserDetails {
 
     private static final long serialVersionUID = 1L;
@@ -31,7 +32,7 @@ public class UserDetailsImpl implements UserDetails {
     private Collection<? extends GrantedAuthority> authorities;
 
     public UserDetailsImpl(Long id, String username, String email, String password,
-                           Collection<? extends GrantedAuthority> authorities) {
+            Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.username = username;
         this.email = email;
@@ -39,47 +40,53 @@ public class UserDetailsImpl implements UserDetails {
         this.authorities = authorities;
     }
 
-    //METODO IMPORTANTE: Convierte la entidad User → UserDetailsImpl para que spring security pueda trabajar con ella
+    // METODO IMPORTANTE: Convierte la entidad User → UserDetailsImpl para que
+    // spring security pueda trabajar con ella
     public static UserDetailsImpl build(User user) {
 
-        //Toma los roles del usuario
+        // Toma los roles del usuario
         List<GrantedAuthority> authorities = user.getRoles().stream()
-        //Convierte cada rol en un formato que entiende Spring
+                // Convierte cada rol en un formato que entiende Spring
                 .map(role -> new SimpleGrantedAuthority(role.getRoleName().name()))
-                //Los guarda en una lista
-                        .collect(Collectors.toList());
+                // Los guarda en una lista
+                .collect(Collectors.toList());
 
-        //Retorna el objeto ya listo para usar en Spring Security
-        return new UserDetailsImpl(user.getUserId(),user.getUserName(),user.getEmail(),
-                user.getPassword(),authorities);
+        // Retorna el objeto ya listo para usar en Spring Security
+        return new UserDetailsImpl(user.getUserId(), user.getUserName(), user.getEmail(),
+                user.getPassword(), authorities);
     }
 
-    //Devuelve los roles
+    // Devuelve los roles
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.authorities;
     }
-    //Devuelve el password
+
+    // Devuelve el password
     @Override
     public @Nullable String getPassword() {
         return this.password;
     }
-    //Devuelve el username
+
+    // Devuelve el username
     @Override
     public String getUsername() {
         return this.username;
     }
-    //Cuenta activa:true
+
+    // Cuenta activa:true
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
-    //Cuenta no bloqueada:true
+
+    // Cuenta no bloqueada:true
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
-    //Cuenta no expirada:true
+
+    // Cuenta no expirada:true
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
@@ -91,9 +98,9 @@ public class UserDetailsImpl implements UserDetails {
     }
 
     @Override
-    //No permite duplicados por Id de Usuario
+    // No permite duplicados por Id de Usuario
     public boolean equals(Object o) {
-        if(this == o)
+        if (this == o)
             return true;
         if (o == null || getClass() != o.getClass())
             return false;

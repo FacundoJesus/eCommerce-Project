@@ -18,9 +18,8 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import java.util.*;
 
-@Tag(name = "Authentications APIs", description = "APIs for managing authentications") //Swagger: Agrupar metodos
+@Tag(name = "Authentications APIs", description = "APIs for managing authentications") // Swagger: Agrupar metodos
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -32,7 +31,7 @@ public class AuthController {
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
 
-        AuthenticationResult result  = authService.login(loginRequest);
+        AuthenticationResult result = authService.login(loginRequest);
 
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE,
                 result.getJwtCookie().toString()).body(result.getResponse());
@@ -47,7 +46,7 @@ public class AuthController {
     @Operation(summary = "Get username of the authenticated user", description = "API to Get username of the authenticated user")
     @GetMapping("/username")
     public String currentUserName(Authentication authentication) {
-        if(authentication != null) {
+        if (authentication != null) {
             return authentication.getName();
         }
         return null;
@@ -68,13 +67,13 @@ public class AuthController {
         ResponseCookie cleanCookie = authService.logoutUser();
 
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE,
-                        cleanCookie.toString())
+                cleanCookie.toString())
                 .body(new MessageResponse("You've been signed out!"));
     }
 
     @GetMapping("/sellers")
-    public ResponseEntity<?>getAllSellers(@RequestParam(
-            name = "pageNumber",defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber) {
+    public ResponseEntity<?> getAllSellers(
+            @RequestParam(name = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber) {
 
         Sort sortByAndOrder = Sort.by(AppConstants.SORT_USERS_BY).descending();
         Pageable pageDetails = PageRequest.of(pageNumber, Integer.parseInt(AppConstants.PAGE_SIZE), sortByAndOrder);
@@ -82,6 +81,5 @@ public class AuthController {
         return ResponseEntity.ok(authService.getAllSellers(pageDetails));
 
     }
-
 
 }
